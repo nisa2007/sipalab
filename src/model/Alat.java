@@ -21,4 +21,8 @@ public abstract class Alat {
     public String getNama() {
         return nama;
     }
+    public String laporanRingkas(){
+       String status = siapDipinjam() ? "SIAP" : "TIDAK SIAP" ;
+       return String.format("%-8s %-22s %s", KodeAlat,nama,status);
+    }
 }
