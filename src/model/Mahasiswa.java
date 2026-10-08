@@ -9,6 +9,7 @@ package model;
  * @author LENOVO
  */
 public class Mahasiswa {
+    public static final int KUOTA_PEMINJAMAN = 3;
     private final String nim;
     private final String nama;
     private final String programStudi;

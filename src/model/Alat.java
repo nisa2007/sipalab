@@ -25,4 +25,15 @@ public abstract class Alat {
        String status = siapDipinjam() ? "SIAP" : "TIDAK SIAP" ;
        return String.format("%-8s %-22s %s", KodeAlat,nama,status);
     }
+    public String getKodeAlat() {
+    return KodeAlat;
+}
+
+public int getTahunPerolehan() {
+    return tahunperolehan;
+}
+protected StatusAlat status = StatusAlat.TERSEDIA;
+
+public StatusAlat getStatus() { return status; }
+public void setStatus(StatusAlat status) { this.status = status; }
 }

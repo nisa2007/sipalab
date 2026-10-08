@@ -1,56 +1,72 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package layanan;
+
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import model.Alat;
-import model.Laptop;
-import model.AlatUkur;
-import model.Proyektor;
 import model.Kalibrasiable;
-/**
- *
- * @author LENOVO
- */
+import pembanding.UrutStatusLaluNama;
+
 public class Inventarislab {
-    private final List<Alat> daftarAlat = new ArrayList<>();
-    
+
+    // Map lebih tepat daripada List untuk pencarian berdasarkan kode:
+    // List harus menelusuri elemen satu per satu (O(n)), sedangkan Map
+    // menghitung letak data dari kuncinya sehingga langsung ketemu (rata-rata O(1)).
+    // LinkedHashMap dipilih agar urutan masuk tetap terjaga.
+    private final Map<String, Alat> daftarAlat = new LinkedHashMap<>();
+
     public void tambah(Alat alat) {
-        daftarAlat.add(alat);
-    }
-    public List<Alat> semuaAlat(){
-        return daftarAlat;
+        daftarAlat.put(alat.getKodeAlat(), alat);
     }
 
-//public void cetakStatusBercabang() {
-//    for (Alat a : daftarAlat) {
-//        if (a instanceof Laptop){
-//        Laptop l = (Laptop) a;
-//        System.out.println(l.getNama() + "" + l.siapDipinjam());  
-//        } else if (a instanceof Proyektor) {
-//        Proyektor p = (Proyektor) a;
-//        System.out.println(p.getNama() + "" + p.siapDipinjam());  
-//        }else if (a instanceof AlatUkur) {
-//        AlatUkur u = (AlatUkur) a;
-//        System.out.println(u.getNama() + "" + u.siapDipinjam());  
-//        }
-//        Contoh menggunakan cetak bercabang
-//    }
-    public void cetakStatus (){
-        for (Alat a : daftarAlat){
-            System.out.println(a.laporanRingkas());
+    public List<Alat> semuaAlat() {
+        return new ArrayList<>(daftarAlat.values());
+    }
+
+    public Alat cariKode(String kode) {
+        return daftarAlat.get(kode);   // null bila tidak ada
+    }
+
+    public void cetakStatus() {
+        for (Alat a : daftarAlat.values()) {
+            System.out.println(a.getNama() + " " + a.siapDipinjam());
         }
     }
-        public void cetakJadwalKalibrasi() {
-        for (Alat a : daftarAlat) {
+
+    public void cetakJadwalKalibrasi() {
+        for (Alat a : daftarAlat.values()) {
             if (a instanceof Kalibrasiable k) {
                 System.out.println(a.getNama() + " - jatuh tempo: " + k.jatuhTempoKalibrasi()
                         + " - perlu kalibrasi: " + k.perluKalibrasi());
             }
         }
     }
-}
-    
 
+    public List<Alat> urut(Comparator<Alat> pembanding) {
+        List<Alat> salinan = new ArrayList<>(daftarAlat.values());
+        salinan.sort(pembanding);
+        return salinan;
+    }
+
+    public List<Alat> urutBawaan() {
+        return urut(new UrutStatusLaluNama());
+    }
+
+    public void hapusYangTidakSiap() {
+        daftarAlat.values().removeIf(a -> !a.siapDipinjam());
+    }
+
+    public List<Alat> cari(String kata) {
+        String k = kata.toLowerCase();
+        List<Alat> hasil = new ArrayList<>();
+        for (Alat a : daftarAlat.values()) {
+            if (a.getNama().toLowerCase().contains(k)
+                    || a.getKodeAlat().toLowerCase().contains(k)) {
+                hasil.add(a);
+            }
+        }
+        return hasil;
+    }
+}
