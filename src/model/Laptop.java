@@ -1,3 +1,4 @@
+
 package model;
 import java.time.LocalDate;
 /**
@@ -6,7 +7,7 @@ import java.time.LocalDate;
 
 
 public class Laptop extends Alat implements Terlacak, Dipesan {
-
+    
     private static final long serialVersionUID = 1L;
      private static final int MIN_HARI_PESAN = 2;
 

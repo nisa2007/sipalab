@@ -1,4 +1,8 @@
+import java.io.FileWriter;
+import java.io.IOException;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 import model.*;
 import layanan.Inventarislab;
@@ -8,6 +12,8 @@ import transaksi.peminjaman;
 import transaksi.DetailPeminjaman;
 import koleksi.Keranjang;
 import pembanding.UrutNama;
+import berkas.EksporLaporan;
+import berkas.PenyimpananBerkas;
 import eksepsi.DataTidakValidException;
 import eksepsi.SipalabException;
 
@@ -163,7 +169,7 @@ public class Main {
             System.out.println("  Setelah dipinjam : " + cadangan.getStatus().getLabel());
             p.kembalikan();
             System.out.println("  Setelah kembali  : " + cadangan.getStatus().getLabel()
-                    + " (denda Rp" + p.hitungDenda()+ ")");
+                    + " (denda Rp" + p.hitungDenda() + ")");
             cadangan.setStatus(StatusAlat.DALAM_PERBAIKAN);
             layananPinjam.pinjam(mhs2, ptg, cadangan, 1);   // ditolak: sedang diperbaiki
         } catch (SipalabException e) {
@@ -180,8 +186,36 @@ public class Main {
             System.out.println("  DITOLAK " + e.getMessage());
         }
 
+        // ===== JOB SHEET 7 =====
         System.out.println();
-        // ujiRapuh();   // E.1: aktifkan sendiri, ketik huruf, catat pesannya, lalu beri // lagi
+        System.out.println("=== Uji Berkas dan Serialisasi ===");
+        List<Alat> semua = new ArrayList<>();
+        semua.add(lap);
+        semua.add(pro);
+        semua.add(ukur);
+        semua.add(kabel);
+        semua.add(resistor);
+        semua.add(new Komponen("KP-010", "Kabel HDMI, 2 meter", 2023, 10, 3)); // nama bertanda koma, uji CSV
+
+        try {
+            // tulisTanpaMenutup();   // E.1: versi salah, aktifkan sekali, cek ukuran berkasnya, lalu beri // lagi
+            tulisDenganAman();
+            System.out.println("  uji_aman.txt tertulis.");
+
+            EksporLaporan ekspor = new EksporLaporan();
+            ekspor.tulisInventaris("laporan_inventaris.txt", semua);
+            System.out.println("  laporan_inventaris.txt tertulis.");
+            ekspor.tulisCSV("inventaris.csv", semua);
+            System.out.println("  inventaris.csv tertulis.");
+        } catch (IOException e) {
+            System.out.println("  Gagal menulis berkas: " + e.getMessage());
+        }
+
+        ujiSimpanDanMuat(semua);
+        // ujiMuatSaja();   // E.4: aktifkan HANYA ini (beri // pada ujiSimpanDanMuat di atas)
+
+        System.out.println();
+        // ujiRapuh();   // JS6 E.1: aktifkan sendiri, ketik huruf, catat pesannya, lalu beri // lagi
         ujiTangguh();
     }
 
@@ -194,6 +228,50 @@ public class Main {
             System.out.println("  DITOLAK " + e.getMessage());
         }
     }
+
+    // ---------- Job Sheet 7 ----------
+
+    // E.1: versi yang SENGAJA salah, aliran tidak pernah ditutup
+    public static void tulisTanpaMenutup() throws IOException {
+        FileWriter tulis = new FileWriter("uji_lupa_tutup.txt");
+        tulis.write("Baris ini seharusnya tersimpan.");
+        // sengaja tidak dipanggil tulis.close()
+    }
+
+    // E.1: versi benar, aliran ditutup otomatis oleh try-with-resources
+    public static void tulisDenganAman() throws IOException {
+        try (FileWriter tulis = new FileWriter("uji_aman.txt")) {
+            tulis.write("Baris ini pasti tersimpan.");
+        }
+    }
+
+    // E.3: simpan lalu muat kembali, jumlahnya harus sama
+    private static void ujiSimpanDanMuat(List<Alat> semua) {
+        PenyimpananBerkas penyimpan = new PenyimpananBerkas("inventaris.dat");
+        try {
+            penyimpan.simpan(semua);
+            List<Alat> dimuat = penyimpan.muat();
+            System.out.println("  Disimpan " + semua.size() + " alat, dimuat kembali "
+                    + dimuat.size() + " alat:");
+            for (Alat a : dimuat) {
+                System.out.println("    " + a.deskripsi());
+            }
+        } catch (IOException | ClassNotFoundException e) {
+            System.out.println("  Gagal menyimpan atau memuat: " + e);
+        }
+    }
+
+    // E.4: hanya memuat (tanpa menyimpan ulang) untuk membuktikan kerapuhan serialisasi
+    private static void ujiMuatSaja() {
+        try {
+            List<Alat> dimuat = new PenyimpananBerkas("inventaris.dat").muat();
+            System.out.println("  Berhasil dimuat: " + dimuat.size() + " alat");
+        } catch (IOException | ClassNotFoundException e) {
+            System.out.println("  Gagal memuat: " + e);
+        }
+    }
+
+    // ---------- Job Sheet 6 ----------
 
     // E.1: versi rapuh, sengaja tanpa penanganan apa pun
     public static void ujiRapuh() {

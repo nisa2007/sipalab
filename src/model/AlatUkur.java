@@ -3,6 +3,7 @@ package model;
 import java.time.LocalDate;
 
 public class AlatUkur extends Alat implements Kalibrasiable {
+    private static final long serialVersionUID = 1L;
     private String satuan;
     private LocalDate kalibrasiTerakhir;
 

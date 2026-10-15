@@ -1,0 +1,13 @@
+LAPORAN INVENTARIS ALAT LABORATORIUM
+Tanggal cetak: 2026-10-15
+
+KODE       NAMA                       JENIS          STATUS        
+--------------------------------------------------------------------
+LP-002     Lenovo ThinkPad            Laptop         Dipinjam      
+PJ-003     Epson EB-X51               Proyektor      Dipinjam      
+AU-004     Multimeter Fluke           AlatUkur       Tersedia      
+KP-005     Kabel HDMI                 Komponen       Dipinjam      
+KP-006     Resistor 220 Ohm           Komponen       Tersedia      
+KP-010     Kabel HDMI, 2 meter        Komponen       Tersedia      
+
+Jumlah alat: 6
